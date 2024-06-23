@@ -1,0 +1,23 @@
+image: python:3.10
+
+stages:
+  - build
+  - test
+
+before_script:
+  - pip install --upgrade pip
+  - pip install -r requirements.txt
+
+build:
+  stage: build
+  script:
+    - echo "Building the project..."
+    - python -m compileall src/
+
+test:
+  stage: test
+  script:
+    - pytest
+  artifacts:
+    paths:
+      - report_results.json
