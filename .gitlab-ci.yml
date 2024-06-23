@@ -2,7 +2,11 @@ image: python:3.10
 
 stages:
   - build
-  - test
+  - contract
+  - functional
+
+variables:
+  ENVIRONMENT: "uat"
 
 before_script:
   - pip install --upgrade pip
@@ -14,10 +18,24 @@ build:
     - echo "Building the project..."
     - python -m compileall src/
 
-test:
-  stage: test
+contract:
+  stage: contract
   script:
-    - pytest
+    - pytest -m contract --junitxml=contract_report.xml
   artifacts:
+    reports:
+      junit:
+        - contract_report.xml
     paths:
-      - report_results.json
+      - contract_report.xml
+
+functional:
+  stage: functional
+  script:
+    - pytest -m functional --junitxml=functional_report.xml
+  artifacts:
+    reports:
+      junit:
+        - functional_report.xml
+    paths:
+      - functional_report.xml

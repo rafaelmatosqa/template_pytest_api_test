@@ -1,22 +1,18 @@
 import pytest
 import json
+import os
 
-from src.apis.client import ApiClient
+from src.api.client import ApiClient
 from src.validation.schema_validator import SchemaValidator
-
-
-def pytest_addoption(parser):
-    parser.addoption(
-        "--env", action="store", default="dev", help="Environment to run tests against"
-    )
 
 
 @pytest.fixture(scope="session")
 def env_config(request):
-    env = request.getoption("env")
-    with open(f'config/{env}.json', 'r') as config_file:
+    env = os.getenv('ENV', 'dev')
+    config_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "config", f"{env}.json"))
+    with open(config_path, 'r') as config_file:
         config = json.load(config_file)
-        return config
+    return config
 
 
 @pytest.fixture(scope="session")
