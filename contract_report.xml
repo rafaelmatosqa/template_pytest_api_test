@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="0" skipped="0" tests="1" time="0.347" timestamp="2024-06-23T01:15:02.287522" hostname="LAPTOP-JJMLJ2BJ"><testcase classname="src.tests.test_user" name="test_should_return_valid_user_contract" time="0.193" /></testsuite></testsuites>
