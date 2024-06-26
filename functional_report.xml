@@ -1,1 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="0" skipped="0" tests="1" time="0.418" timestamp="2024-06-23T01:20:46.285069" hostname="LAPTOP-JJMLJ2BJ"><testcase classname="src.tests.test_user" name="test_given_valid_user_id_when_consulting_user_then_should_return_data_user" time="0.241" /></testsuite></testsuites>
+<?xml version="1.0" encoding="utf-8"?>
+<testsuites>
+    <testsuite name="pytest" errors="0" failures="0" skipped="0" tests="1" time="0.418"
+               timestamp="2024-06-23T01:20:46.285069" hostname="LAPTOP-JJMLJ2BJ">
+        <testcase classname="src.tests.test_user"
+                  name="test_given_valid_user_id_when_consulting_user_then_should_return_data_user" time="0.241"/>
+    </testsuite>
+</testsuites>
