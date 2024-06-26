@@ -18,7 +18,12 @@ before_script:
   - python -m venv venv
   - source venv/bin/activate
   - pip install --upgrade pip
-  - pip install -r "requirements.txt"
+  - pip install -r requirements.txt
+  - pip install pytest allure-pytest
+  - curl -sLo allure-2.13.8.tgz https://github.com/allure-framework/allure2/releases/download/2.13.8/allure-2.13.8.tgz
+  - tar -xzf allure-2.13.8.tgz
+  - mv allure-2.13.8 /opt/allure
+  - export PATH=$PATH:/opt/allure/bin
 
 test:
   stage: test
@@ -34,7 +39,7 @@ report:
   dependencies:
     - test
   script:
-    - allure generate $ALLURE_RESULTS -o $ALLURE_REPORT
+    - /opt/allure/bin/allure generate $ALLURE_RESULTS -o $ALLURE_REPORT
     - mv $ALLURE_REPORT public
   artifacts:
     paths:
