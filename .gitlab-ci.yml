@@ -1,41 +1,41 @@
 image: python:3.10
 
 stages:
-  - build
-  - contract
-  - functional
+  - test
+  - report
+  - deploy
 
 variables:
-  ENVIRONMENT: "uat"
+  REPORTS_DIR: allure-report
+  ALLURE_VERSION: 2.13.8
 
 before_script:
-  - pip install --upgrade pip
-  - pip install -r requirements.txt
+  - apt-get update && apt-get install -y openjdk-11-jre wget unzip
+  - wget https://repo.maven.apache.org/maven2/io/qameta/allure/allure-commandline/$ALLURE_VERSION/allure-commandline-$ALLURE_VERSION.zip -O allure.zip
+  - unzip allure.zip -d /opt/
+  - export PATH=$PATH:/opt/allure-$ALLURE_VERSION/bin
 
-build:
-  stage: build
+test:
+  stage: test
   script:
-    - echo "Building the project..."
-    - python -m compileall src/
+    - pip install -r requirements.txt
+    - pytest --alluredir=${REPORTS_DIR}/results
 
-contract:
-  stage: contract
+report:
+  stage: report
   script:
-    - pytest -m contract --junitxml=contract_report.xml
+    - allure generate ${REPORTS_DIR}/results -o ${REPORTS_DIR}/report
   artifacts:
-    reports:
-      junit:
-        - contract_report.xml
     paths:
-      - contract_report.xml
+      - ${REPORTS_DIR}/report
 
-functional:
-  stage: functional
+pages:
+  stage: deploy
   script:
-    - pytest -m functional --junitxml=functional_report.xml
+    - mkdir -p public
+    - cp -r ${REPORTS_DIR}/report/* public
   artifacts:
-    reports:
-      junit:
-        - functional_report.xml
     paths:
-      - functional_report.xml
+      - public
+  only:
+    - main
