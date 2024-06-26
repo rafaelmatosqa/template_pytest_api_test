@@ -1,41 +1,57 @@
-image: python:3.10
+image: python:3.9
 
 stages:
   - test
   - report
-  - deploy
 
 variables:
-  REPORTS_DIR: allure-report
-  ALLURE_VERSION: 2.13.8
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  ALLURE_RESULTS: "allure-results"
+  ALLURE_REPORT: "allure-report"
+
+cache:
+  paths:
+    - .cache/pip
+    - venv/
 
 before_script:
-  - apt-get update && apt-get install -y python3 python3-pip wget unzip
-  - wget https://repo.maven.apache.org/maven2/io/qameta/allure/allure-commandline/$ALLURE_VERSION/allure-commandline-$ALLURE_VERSION.zip -O allure.zip
-  - unzip allure.zip -d /opt/
-  - export PATH=$PATH:/opt/allure-$ALLURE_VERSION/bin
+  - python -m venv venv
+  - source venv/bin/activate
+  - pip install --upgrade pip
+  - pip install pytest pytest-allure-adaptor allure-pytest
 
 test:
   stage: test
   script:
-    - pip install -r requirements.txt
-    - pytest --alluredir=${REPORTS_DIR}/results
+    - pytest --alluredir=$ALLURE_RESULTS
+  artifacts:
+    paths:
+      - $ALLURE_RESULTS
+    when: always
 
 report:
   stage: report
+  dependencies:
+    - test
   script:
-    - allure generate ${REPORTS_DIR}/results -o ${REPORTS_DIR}/report
-  artifacts:
-    paths:
-      - ${REPORTS_DIR}/report
-
-pages:
-  stage: deploy
-  script:
-    - mkdir -p public
-    - cp -r ${REPORTS_DIR}/report/* public
+    - allure generate $ALLURE_RESULTS -o $ALLURE_REPORT
+    - mv $ALLURE_REPORT public
   artifacts:
     paths:
       - public
+    expire_in: 1 week
+  only:
+    - main
+
+pages:
+  stage: report
+  dependencies:
+    - report
+  script:
+    - mv public/ $CI_PROJECT_DIR/public
+  artifacts:
+    paths:
+      - public
+    expire_in: 1 week
   only:
     - main
