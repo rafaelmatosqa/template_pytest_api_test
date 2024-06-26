@@ -42,7 +42,7 @@ report:
     - test
   script:
     - allure generate $ALLURE_RESULTS -o $ALLURE_REPORT
-    - mv $ALLURE_REPORT public
+    - mv $ALLURE_REPORT public || true  # Use '|| true' to prevent pipeline failure if 'public/' doesn't exist
   artifacts:
     paths:
       - public
@@ -57,7 +57,7 @@ pages:
   dependencies:
     - report
   script:
-    - mv public/ $CI_PROJECT_DIR/public
+    - if [ -d "public/" ]; then mv public/ $CI_PROJECT_DIR/public; fi  # Check if 'public/' exists before moving
   artifacts:
     paths:
       - public
