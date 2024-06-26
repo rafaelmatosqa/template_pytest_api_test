@@ -1,41 +1,57 @@
 image: python:3.10
 
 stages:
-  - build
-  - contract
-  - functional
+  - test
+  - report
 
 variables:
-  ENVIRONMENT: "uat"
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  ALLURE_RESULTS: "allure-results"
+  ALLURE_REPORT: "allure-report"
+
+cache:
+  paths:
+    - .cache/pip
+    - venv/
 
 before_script:
+  - python -m venv venv
+  - source venv/bin/activate
   - pip install --upgrade pip
-  - pip install -r requirements.txt
+  - pip install -r "requirements.txt"
 
-build:
-  stage: build
+test:
+  stage: test
   script:
-    - echo "Building the project..."
-    - python -m compileall src/
-
-contract:
-  stage: contract
-  script:
-    - pytest -m contract --junitxml=contract_report.xml
+    - pytest --alluredir=$ALLURE_RESULTS
   artifacts:
-    reports:
-      junit:
-        - contract_report.xml
     paths:
-      - contract_report.xml
+      - $ALLURE_RESULTS
+    when: always
 
-functional:
-  stage: functional
+report:
+  stage: report
+  dependencies:
+    - test
   script:
-    - pytest -m functional --junitxml=functional_report.xml
+    - allure generate $ALLURE_RESULTS -o $ALLURE_REPORT
+    - mv $ALLURE_REPORT public
   artifacts:
-    reports:
-      junit:
-        - functional_report.xml
     paths:
-      - functional_report.xml
+      - public
+    expire_in: 1 week
+  only:
+    - main
+
+pages:
+  stage: report
+  dependencies:
+    - report
+  script:
+    - mv public/ $CI_PROJECT_DIR/public
+  artifacts:
+    paths:
+      - public
+    expire_in: 1 week
+  only:
+    - main
