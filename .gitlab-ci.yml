@@ -18,7 +18,7 @@ before_script:
   - python -m venv venv
   - source venv/bin/activate
   - pip install --upgrade pip
-  - pip install pytest pytest-allure-adaptor allure-pytest
+  - pip install pytest allure-pytest
 
 test:
   stage: test
