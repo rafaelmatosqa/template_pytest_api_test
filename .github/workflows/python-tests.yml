@@ -73,12 +73,12 @@ jobs:
 
       - name: Generate Allure report
         run: |
-          /opt/allure/bin/allure generate allure-results -o allure-report
+          /opt/allure/bin/allure generate allure-results -o public
 
       - name: Upload Allure report
         uses: actions/upload-pages-artifact@v1
         with:
-          path: allure-report
+          path: public
 
   deploy:
     runs-on: ubuntu-latest
@@ -86,3 +86,6 @@ jobs:
     steps:
       - name: Deploy Allure report
         uses: actions/deploy-pages@v2
+        with:
+          branch: main
+          folder: public
