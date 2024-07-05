@@ -39,8 +39,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y default-jre
           wget https://repo.maven.apache.org/maven2/io/qameta/allure/allure-commandline/2.13.8/allure-commandline-2.13.8.zip
-          unzip allure-commandline-2.13.8.zip
-          sudo mv allure-2.13.8/bin/allure /usr/bin/allure
+          unzip allure-commandline-2.13.8.zip -d allure
+          sudo mv allure/allure-2.13.8/bin/allure /usr/bin/allure
           allure --version  # Verify Allure installation
 
       - name: Run tests
@@ -91,4 +91,5 @@ jobs:
         uses: actions/deploy-gh-pages@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main  # Especifique a branch principal do repositório
           folder: public
