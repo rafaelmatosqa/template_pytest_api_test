@@ -38,11 +38,10 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y default-jre
-          curl -sLo allure-2.13.8.tgz https://github.com/allure-framework/allure2/releases/download/2.13.8/allure-2.13.8.tgz
-          tar -xzf allure-2.13.8.tgz
-          sudo mv allure-2.13.8 /opt/allure
-          echo "/opt/allure/bin" >> $GITHUB_PATH
-          echo "JAVA_HOME=/usr/lib/jvm/default-java" >> $GITHUB_ENV
+          wget https://repo.maven.apache.org/maven2/io/qameta/allure/allure-commandline/2.13.8/allure-commandline-2.13.8.zip
+          unzip allure-commandline-2.13.8.zip
+          sudo mv allure-2.13.8/bin/allure /usr/bin/allure
+          allure --version  # Verify Allure installation
 
       - name: Run tests
         run: |
@@ -73,7 +72,7 @@ jobs:
 
       - name: Generate Allure report
         run: |
-          /opt/allure/bin/allure generate allure-results -o public
+          allure generate allure-results -o public
 
       - name: Upload Allure report
         uses: actions/upload-artifact@v2
