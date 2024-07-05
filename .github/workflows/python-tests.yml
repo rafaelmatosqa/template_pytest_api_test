@@ -1,0 +1,88 @@
+name: Python Tests and Allure Report
+
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Cache pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest allure-pytest
+
+      - name: Install JDK
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y default-jre
+          curl -sLo allure-2.13.8.tgz https://github.com/allure-framework/allure2/releases/download/2.13.8/allure-2.13.8.tgz
+          tar -xzf allure-2.13.8.tgz
+          sudo mv allure-2.13.8 /opt/allure
+          echo "/opt/allure/bin" >> $GITHUB_PATH
+          echo "JAVA_HOME=/usr/lib/jvm/default-java" >> $GITHUB_ENV
+
+      - name: Run tests
+        run: |
+          source venv/bin/activate
+          pytest --alluredir=allure-results
+        env:
+          ALLURE_RESULTS: allure-results
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: allure-results
+          path: allure-results
+
+  report:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Download test results
+        uses: actions/download-artifact@v3
+        with:
+          name: allure-results
+          path: allure-results
+
+      - name: Generate Allure report
+        run: |
+          /opt/allure/bin/allure generate allure-results -o allure-report
+
+      - name: Upload Allure report
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: allure-report
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: report
+    steps:
+      - name: Deploy Allure report
+        uses: actions/deploy-pages@v2
