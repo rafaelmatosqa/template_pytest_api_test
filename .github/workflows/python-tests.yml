@@ -34,14 +34,10 @@ jobs:
           pip install -r requirements.txt
           pip install pytest allure-pytest
 
-      - name: Install JDK and Allure CLI
+      - name: Install Allure CLI
         run: |
           sudo apt-get update
-          sudo apt-get install -y default-jre
-          wget https://repo.maven.apache.org/maven2/io/qameta/allure/allure-commandline/2.13.8/allure-commandline-2.13.8.zip
-          unzip allure-commandline-2.13.8.zip -d allure
-          sudo mv allure/allure-2.13.8/bin/allure /usr/bin/allure
-          allure --version  # Verify Allure installation
+          sudo apt-get install -y allure
 
       - name: Run tests
         run: |
