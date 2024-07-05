@@ -68,7 +68,7 @@ jobs:
 
       - name: Generate Allure report
         run: |
-          allure generate allure-results -o public
+          sudo allure generate allure-results -o public
 
       - name: Upload Allure report
         uses: actions/upload-artifact@v2
